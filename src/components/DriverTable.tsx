@@ -58,7 +58,7 @@ export default function DriverTable() {
     const fetchDrivers = async () => {
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/drivers`
+          `${process.env.NEXT_PUBLIC_API_URL}/demo/drivers`
         );
         if (Array.isArray(response.data)) {
           // Assign random dummy vehicle to each driver
@@ -97,7 +97,7 @@ export default function DriverTable() {
 
       try {
         const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/drivers/drivers/${driverId}/document/upload`,
+          `${process.env.NEXT_PUBLIC_API_URL}/demo/drivers/drivers/${driverId}/document/upload`,
           formData,
           {
             headers: {

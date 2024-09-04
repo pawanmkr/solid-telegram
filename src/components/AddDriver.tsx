@@ -28,7 +28,7 @@ export default function AddDriver() {
     try {
       console.log(process.env.NEXT_PUBLIC_API_URL);
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/drivers`,
+        `${process.env.NEXT_PUBLIC_API_URL}/demo/drivers`,
         {
           name,
           phone,
