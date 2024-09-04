@@ -26,10 +26,14 @@ export default function AddDriver() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:8000/drivers", {
-        name,
-        phone,
-      });
+      console.log(process.env.NEXT_PUBLIC_API_URL);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/drivers`,
+        {
+          name,
+          phone,
+        }
+      );
       console.log(response);
       if (response.status === 201) {
         setStatus("Driver added successfully.");
