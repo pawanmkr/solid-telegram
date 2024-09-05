@@ -12,10 +12,9 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Pencil, Trash2, ChevronDown, ChevronUp, Loader } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader } from "lucide-react";
 import { dummyVehicles } from "@/lib/vehicles";
 
-// Custom Alert component with TypeScript props
 interface AlertProps {
   children: ReactNode;
   variant?: "default" | "destructive";
@@ -43,8 +42,17 @@ enum DriverDocumentType {
   PHOTO = "PHOTO",
 }
 
-export default function DriverTable() {
-  const [drivers, setDrivers] = useState<any[]>([]);
+export default function DriverTable({
+  drivers,
+  setDrivers,
+  error,
+  setError,
+}: {
+  drivers: any[];
+  setDrivers: React.Dispatch<React.SetStateAction<any[]>>;
+  error: string;
+  setError: React.Dispatch<React.SetStateAction<string>>;
+}) {
   const [openRow, setOpenRow] = useState<number | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedFileType, setSelectedFileType] = useState<DriverDocumentType>(
@@ -52,34 +60,6 @@ export default function DriverTable() {
   );
   const [uploadResponse, setUploadResponse] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-
-  useEffect(() => {
-    const fetchDrivers = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/demo/drivers`
-        );
-        if (Array.isArray(response.data)) {
-          // Assign random dummy vehicle to each driver
-          const driversWithVehicles = response.data.map((driver) => ({
-            ...driver,
-            vehicle:
-              dummyVehicles[Math.floor(Math.random() * dummyVehicles.length)],
-          }));
-          setDrivers(driversWithVehicles);
-        } else {
-          console.error("Expected an array but got:", response.data);
-          setDrivers([]);
-        }
-      } catch (error) {
-        console.error("Error fetching drivers:", error);
-        setError("Failed to fetch drivers. Please try again later.");
-      }
-    };
-
-    fetchDrivers();
-  }, []);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -160,8 +140,8 @@ export default function DriverTable() {
           <TableHead>Phone</TableHead>
           <TableHead>Check-In</TableHead>
           <TableHead>Check-Out</TableHead>
-          <TableHead>Assigned Vehicle</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          {/* <TableHead>Assigned Vehicle</TableHead>
+          <TableHead className="text-right">Actions</TableHead> */}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -187,7 +167,7 @@ export default function DriverTable() {
                   <TableCell>{driver.phone}</TableCell>
                   <TableCell>{driver.checkInTime || "00:00:00"}</TableCell>
                   <TableCell>{driver.checkOutTime || "00:00:00"}</TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     {driver.vehicle ? driver.vehicle.model : "N/A"}
                   </TableCell>
                   <TableCell className="text-right">
@@ -195,13 +175,13 @@ export default function DriverTable() {
                       <Pencil className="cursor-pointer" />
                       <Trash2 className="cursor-pointer" />
                     </div>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
                 {openRow === driver.id && (
                   <TableRow className="bg-gray-100">
                     <TableCell colSpan={6}>
                       {/* Vehicle Details */}
-                      <div className="bg-white p-4 rounded-md shadow-sm mb-4">
+                      {/* <div className="bg-white p-4 rounded-md shadow-sm mb-4">
                         <h4 className="font-semibold mb-2">Vehicle Details</h4>
                         <ul className="text-sm text-gray-600 flex">
                           <li className="mr-8">
@@ -224,7 +204,7 @@ export default function DriverTable() {
                             {driver.vehicle?.color || "N/A"}
                           </li>
                         </ul>
-                      </div>
+                      </div> */}
 
                       {/* Document Details */}
                       <div className="grid grid-cols-2 gap-4">

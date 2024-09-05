@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,20 +13,21 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "./ui/progress";
+import { Loader } from "lucide-react";
 
-export default function AddDriver() {
+export default function AddDriver({ setDrivers }: { setDrivers: any }) {
   const [name, setName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [status, setStatus] = useState<string>("");
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState<number>(3);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setStatus(""); // Clear any previous status message
 
     try {
-      console.log(process.env.NEXT_PUBLIC_API_URL);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/demo/drivers`,
         {
@@ -34,24 +35,17 @@ export default function AddDriver() {
           phone,
         }
       );
-      console.log(response);
       if (response.status === 201) {
         setStatus("Driver added successfully.");
-        setName("");
-        setPhone("");
-        setCountdown(5);
-        const countdownInterval = setInterval(() => {
-          setCountdown((prev) => prev - 1);
-        }, 1000);
-
-        setTimeout(() => {
-          clearInterval(countdownInterval);
-          setIsDialogOpen(false);
-        }, 5000);
+        const newDriver = response.data;
+        setDrivers((prev: any) => [...prev, newDriver]);
+        setLoading(false);
+        setIsDialogOpen(false); // Close on success
       } else {
         throw new Error("Unexpected response from the server.");
       }
     } catch (error: any) {
+      setLoading(false);
       console.error(error);
       if (error.response?.status === 400) {
         setStatus("Invalid data provided.");
@@ -63,11 +57,12 @@ export default function AddDriver() {
     }
   };
 
-  useEffect(() => {
-    if (status && countdown === 0) {
-      setIsDialogOpen(false);
-    }
-  }, [countdown]);
+  const handleClose = () => {
+    setName("");
+    setPhone("");
+    setStatus("");
+    setIsDialogOpen(false);
+  };
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -75,7 +70,7 @@ export default function AddDriver() {
         <Button
           variant="outline"
           onClick={() => setIsDialogOpen(true)}
-          className="bg-black text-white px-8"
+          className="bg-gray-300 text-black px-8 hover:bg-black hover:text-white"
         >
           Add Driver
         </Button>
@@ -111,17 +106,30 @@ export default function AddDriver() {
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button type="submit">Save changes</Button>
-          </DialogFooter>
           {status && (
-            <div className="mt-4 text-sm text-gray-600">
-              <p>{status}</p>
-              {countdown > 0 && (
-                <Progress value={(countdown / 5) * 100} className="mt-2" />
-              )}
+            <div
+              className={`text-sm ${
+                status.includes("successfully")
+                  ? "text-green-500"
+                  : "text-red-500"
+              } mt-2`}
+            >
+              {status}
             </div>
           )}
+          <DialogFooter className="mt-4">
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader className="mr-2 animate-spin" size={16} />}
+              {loading ? "Saving..." : "Add"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              className="ml-2 bg-black text-white hover:bg-gray-700"
+            >
+              Close
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
